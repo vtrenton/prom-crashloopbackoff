@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alert-rules
+  namespace: monitoring
+data:
+  alert.rules.yml: |
+    groups:
+      - name: Kubernetes Alerts
+        rules:
+          - alert: PodCrashLoopBackOff
+            expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} > 0
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Pod {{ $labels.pod }} in CrashLoopBackOff"
+              description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is in CrashLoopBackOff status for over 5 minutes."
+
